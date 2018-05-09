@@ -1,0 +1,13 @@
+/node_modules
+
+# IDE
+/.idea
+/.awcache
+/.vscode
+/.history
+
+#build 
+/dist
+
+# misc
+npm-debug.log
