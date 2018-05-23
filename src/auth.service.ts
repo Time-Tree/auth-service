@@ -17,13 +17,12 @@ import { reset } from './templates/reset';
 import { changed } from './templates/changed';
 import Smser from './utils/sms';
 
-export const SECRET = 'LzkAsVJERDUv19teALmc';
-const jwtAuth = expressJwt({ secret: SECRET });
-
 export class AuthService extends BaseService<IUser, Model<IUser>> {
   public model: any;
-  constructor(userModel) {
+  private jwtAuth;
+  constructor(userModel, private secret) {
     super(userModel);
+    this.jwtAuth = expressJwt({ secret });
   }
 
   async register(user: IUser) {
@@ -65,7 +64,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       try {
         const user: any = await this.authenticate(req, res);
 
-        const token = sign({ id: user.id }, SECRET, { expiresIn: 24 * 120 * 60 });
+        const token = sign(this.serialize(user), this.secret, { expiresIn: 24 * 120 * 60 });
         resolve({
           user: this.serialize(user),
           token
@@ -125,19 +124,20 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   }
 
   // middlewares
-  checkForAuth(req, res, next) {
+  checkForAuth = (req, res, next) => {
     console.warn('checking for auth');
     if (req.user) {
       return next();
     }
-    return jwtAuth(req, res, next);
-  }
+    return this.jwtAuth(req, res, next);
+  };
 
-  enrichAuth(req, res, next) {
+  enrichAuth = (req, res, next) => {
+    console.warn('enriched route');
     this.checkForAuth(req, res, err => {
       next();
     });
-  }
+  };
 
   async forgotPass(email) {
     const user = await this.model.findOne({ email });
@@ -214,13 +214,20 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   private serialize(user) {
     // we store the updated information in req.user again
     const { id, username, email, firstname, lastname, status } = user;
+    const userFields = {};
+    if (AuthConfig.options.userFields) {
+      AuthConfig.options.userFields.reduce((fields, field) => {
+        fields[field] = user[field];
+      }, userFields);
+    }
     return {
       id,
       username,
       email,
       firstname,
       lastname,
-      status
+      status,
+      ...userFields
     };
   }
 
