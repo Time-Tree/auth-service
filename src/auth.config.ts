@@ -26,6 +26,7 @@ export interface AuthConfigOptions {
   };
   publicRoutes?: string[];
   enrichedRoutes?: string[];
+  userFields?;
 }
 
 const DefaultConfigOptions: AuthConfigOptions = {
@@ -56,20 +57,16 @@ export class AuthConfig {
     app.use(passport.initialize());
     app.use(passport.session());
     // passport config
-    const authService = new AuthService(AuthConfig.options.userModel);
+    const authService = new AuthService(AuthConfig.options.userModel, AuthConfig.options.secretKey);
     const authRoutes = new AuthRoutes(authService);
     app.use('/auth', authRoutes.router);
     const user = AuthConfig.options.userModel as PassportLocalModel<IUser>;
-    const pubRoutes = (AuthConfig.options.publicRoutes || ['auth\\/login'])
-      .concat('auth\\/login', 'auth\\/register', 'auth\\/activation')
-      .join('|');
+    const pubRoutes = (AuthConfig.options.publicRoutes || []).concat('auth\\/login', 'auth\\/register', 'auth\\/activation').join('|');
     const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
-    // app.use(publicRegExp, authService.checkForAuth);
-    const enrichRoutes = (AuthConfig.options.enrichedRoutes || ['auth\\/logout'])
-      .concat('auth\\/login', 'auth\\/register', 'auth\\/activation')
-      .join('|');
-    const enrichRegExp = new RegExp(`^(?!.*(${enrichRoutes})).*$`);
-    // app.use(enrichRegExp, authService.enrichAuth);
+    app.use(publicRegExp, authService.checkForAuth);
+    const enrichRoutes = (AuthConfig.options.enrichedRoutes || []).concat('auth\\/logout').join('|');
+    const enrichRegExp = new RegExp(`^(.*(${enrichRoutes})).*$`);
+    app.use(enrichRegExp, authService.enrichAuth);
     passport.use(new LocalStrategy(user.authenticate()));
     passport.serializeUser(user.serializeUser());
     passport.deserializeUser(user.deserializeUser());
