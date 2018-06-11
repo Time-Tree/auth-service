@@ -10,7 +10,7 @@ export const register = (user: IUser) => {
         <mj-text align="left" font-weight="400">Dear ${user.firstname} ${user.lastname}</mj-text>
         <mj-text align="left" font-weight="400">Please activate your account ${options.host}/auth/activation/${
     user.registrationToken
-  }.</mj-text>
+    }.</mj-text>
       </mj-column>
     `);
 };

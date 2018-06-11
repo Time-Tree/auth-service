@@ -22,7 +22,7 @@ export interface AuthConfigOptions {
   mailerApiKey?: string;
   smsConfig?: {
     apiKey?: string;
-    secretKey?: string;
+    apiSecret?: string;
   };
   publicRoutes?: string[];
   enrichedRoutes?: string[];
@@ -40,7 +40,7 @@ const DefaultConfigOptions: AuthConfigOptions = {
   mailerApiKey: process.env.SENDGRID_API_KEY,
   smsConfig: {
     apiKey: process.env.NEXMO_API_KEY,
-    secretKey: process.env.NEXMO_SECRET_KEY
+    apiSecret: process.env.NEXMO_SECRET_KEY
   }
 };
 
