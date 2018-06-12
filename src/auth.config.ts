@@ -48,6 +48,7 @@ export const mergedOptions: AuthConfigOptions = { secretKey: process.env.SECRET_
 
 export class AuthConfig {
   public static options: AuthConfigOptions;
+  private authService;
 
   constructor(app, opts?: AuthConfigOptions) {
     const mailerService = (opts && opts.mailerService) || new Mailer(opts && opts.mailerApiKey) || process.env.SENDGRID_API_KEY;
@@ -57,18 +58,19 @@ export class AuthConfig {
     app.use(passport.initialize());
     app.use(passport.session());
     // passport config
-    const authService = new AuthService(AuthConfig.options.userModel, AuthConfig.options.secretKey);
-    const authRoutes = new AuthRoutes(authService);
+    this.authService = new AuthService(AuthConfig.options.userModel, AuthConfig.options.secretKey);
+    const authRoutes = new AuthRoutes(this.authService);
     app.use('/auth', authRoutes.router);
     const user = AuthConfig.options.userModel as PassportLocalModel<IUser>;
     const pubRoutes = (AuthConfig.options.publicRoutes || []).concat('auth\\/login', 'auth\\/register', 'auth\\/activation').join('|');
     const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
-    app.use(publicRegExp, authService.checkForAuth);
+    app.use(publicRegExp, this.authService.checkForAuth);
     const enrichRoutes = (AuthConfig.options.enrichedRoutes || []).concat('auth\\/logout').join('|');
     const enrichRegExp = new RegExp(`^(.*(${enrichRoutes})).*$`);
-    app.use(enrichRegExp, authService.enrichAuth);
+    app.use(enrichRegExp, this.authService.enrichAuth);
     passport.use(new LocalStrategy(user.authenticate()));
     passport.serializeUser(user.serializeUser());
     passport.deserializeUser(user.deserializeUser());
   }
+  public getService = () => this.authService;
 }
