@@ -3,7 +3,7 @@
   "author": {
     "name": "Time Tree"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "dependencies": {
     "@sendgrid/mail": "^6.2.1",
     "@timetree/base-service": "^1.0.9",
