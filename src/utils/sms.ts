@@ -14,8 +14,8 @@ export class Smser {
       Smser.initialize();
     }
     return new Promise((resolve, reject) => {
-      const text = `Te-ai inregistrat cu succes in aplicatia Columna! Codul tau de verificare este: ${code} `;
-      const sent = Smser.nexmo.message.sendSms('Columna', to, text, (error, response) => {
+      const text = `Te-ai inregistrat cu succes in aplicatia ${AuthConfig.options.appTitle}! Codul tau de verificare este: ${code} `;
+      const sent = Smser.nexmo.message.sendSms(AuthConfig.options.appTitle, to, text, (error, response) => {
         if (error) {
           reject(error);
         } else if (response.messages[0].status !== '0') {

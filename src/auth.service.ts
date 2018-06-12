@@ -63,10 +63,10 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     return new Promise(async (resolve, reject) => {
       try {
         const user: any = await this.authenticate(req, res);
-
-        const token = sign(this.serialize(user), this.secret, { expiresIn: 24 * 120 * 60 });
+        const suser = await this.serialize(user);
+        const token = sign(await this.serialize(user), this.secret, { expiresIn: 24 * 120 * 60 });
         resolve({
-          user: this.serialize(user),
+          user: suser,
           token
         });
       } catch (e) {
@@ -211,7 +211,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     });
   }
 
-  private serialize(user) {
+  private async serialize(user) {
     // we store the updated information in req.user again
     const { id, username, email, firstname, lastname, status } = user;
     const userFields = {};
@@ -220,7 +220,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         fields[field] = user[field];
       }, userFields);
     }
-    return {
+    let suser = {
       id,
       username,
       email,
@@ -229,6 +229,11 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       status,
       ...userFields
     };
+
+    if (AuthConfig.options.serializationHelper) {
+      suser = await AuthConfig.options.serializationHelper(suser);
+    }
+    return suser;
   }
 
   private verifyStatus(user) {
