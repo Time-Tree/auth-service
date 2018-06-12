@@ -27,6 +27,7 @@ export interface AuthConfigOptions {
   publicRoutes?: string[];
   enrichedRoutes?: string[];
   userFields?;
+  serializationHelper?: (user) => any;
 }
 
 const DefaultConfigOptions: AuthConfigOptions = {
