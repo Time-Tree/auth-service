@@ -1,5 +1,5 @@
 import { Model, PassportLocalModel } from 'mongoose';
-import { BaseService } from '@timetree/base-service';
+import { BaseService, isError, IErrorInfo } from '@timetree/base-service';
 import * as uuid from 'uuid';
 import { sign } from 'jsonwebtoken';
 import * as expressJwt from 'express-jwt';
@@ -51,6 +51,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
             this.sendPhoneConfirmationCode(`${u._id}`);
           }
           resolve({
+            id: u._id,
             username: u.username,
             email: u.email
           });
@@ -171,7 +172,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     });
   }
 
-  async sendPhoneConfirmationCode(user: string | IUser) {
+  async sendPhoneConfirmationCode(user: string | IUser | IErrorInfo) {
     if (typeof user === 'string') {
       user = await this.getById(user);
     }
@@ -184,7 +185,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   async confirmPhone(sentCode, userId) {
     return new Promise(async (resolve, reject) => {
       const user = await this.getById(userId);
-
+      if (isError(user)) return Promise.reject(user);
       if (user && user.phoneCode === parseInt(sentCode, 10)) {
         const mergedEntity = Object.assign(user, { phoneStatus: UserPhoneStatusEnum.CONFIRMED });
         await this.model.update({ _id: userId }, mergedEntity, { upsert: true });
