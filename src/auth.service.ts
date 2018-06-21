@@ -53,6 +53,8 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
           resolve({
             id: u._id,
             username: u.username,
+            firstname: u.firstname,
+            lastname: u.lastname,
             email: u.email
           });
         }
