@@ -8,6 +8,11 @@ import Mailer from './services/mailer';
 import { AuthService } from './auth.service';
 const LocalStrategy = passportLocal.Strategy;
 
+export interface IPubSubService {
+  subscribeEvent: (event: string, handler: (data) => void) => () => void;
+  publishEvent: (event: string, data: any) => void;
+}
+
 export interface AuthConfigOptions {
   secretKey: string;
   emailConfirmation?: boolean;
@@ -28,6 +33,7 @@ export interface AuthConfigOptions {
   enrichedRoutes?: string[];
   userFields?;
   serializationHelper?: (user) => any;
+  pubSubService?: IPubSubService;
 }
 
 const DefaultConfigOptions: AuthConfigOptions = {

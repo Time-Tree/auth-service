@@ -16,6 +16,8 @@ import { register } from './templates/register';
 import { reset } from './templates/reset';
 import { changed } from './templates/changed';
 import Smser from './utils/sms';
+import publishService from './services/publishService';
+import subscribeService from './services/subscribeService';
 
 export class AuthService extends BaseService<IUser, Model<IUser>> {
   public model: any;
@@ -38,6 +40,15 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         } else {
           u.registrationToken = uuid();
           await u.save();
+          if (AuthConfig.options.pubSubService) {
+            AuthConfig.options.pubSubService.publishEvent('USER_REGISTERED', {
+              user: u,
+              appTitle: AuthConfig.options.appTitle
+            });
+            AuthConfig.options.pubSubService.subscribeEvent('USER_REGISTERED', (data) => {
+              console.log('subscribed to USER_REGISTERED', data);
+            });
+          }
           if (AuthConfig.options.emailConfirmation) {
             // TODO: create mail templates take out of service write
             AuthConfig.options.mailerService &&
@@ -68,6 +79,21 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         const user: any = await this.authenticate(req, res);
         const suser = await this.serialize(user);
         const token = sign(await this.serialize(user), this.secret, { expiresIn: 24 * 120 * 60 });
+        // if (AuthConfig.options.pubSubService) {
+        //   console.log('wtf');
+        //   AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
+        //     userId: suser.id
+        //   });
+        //   AuthConfig.options.pubSubService.subscribeEvent('USER_LOGGEDIN', (data) => {
+        //     console.log('subscribed to USER_LOGGEDIN', data);
+        //   });
+        // }
+        publishService.publishEvent('USER_LOGGEDIN', {
+          userId: suser.id
+        });
+        subscribeService.subscribeEvent('USER_LOGGEDIN', (data) => {
+          console.log('subscribed to USER_LOGGEDIN', data);
+        });
         resolve({
           user: suser,
           token
@@ -80,6 +106,14 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
 
   async logout(req) {
     console.warn('logout service');
+    if (AuthConfig.options.pubSubService) {
+      AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDOUT', {
+        userId: req.user.id
+      });
+      AuthConfig.options.pubSubService.subscribeEvent('USER_LOGGEDOUT', (data) => {
+        console.log('subscribed to USER_LOGGEDIN', data);
+      });
+    }
     req.logout();
     console.warn('req.logout');
     return req.session && req.session.save();
