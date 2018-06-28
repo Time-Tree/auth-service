@@ -26,11 +26,6 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   }
 
   async register(user: IUser) {
-    // if (AuthConfig.options.pubSubService) {
-    //   AuthConfig.options.pubSubService.subscribeEvent('USER_REGISTERED', (data) => {
-    //     console.log('subscribed to USER_REGISTERED');
-    //   });
-    // }
     logger.msg('Registering user with email: ' + user.email);
     const password = user.password as string;
     delete user.password;
@@ -74,11 +69,6 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   }
 
   login(req, res) {
-    // if (AuthConfig.options.pubSubService) {
-    //   AuthConfig.options.pubSubService.subscribeEvent('USER_LOGGEDIN', (data) => {
-    //     console.log('subscribed to USER_LOGGEDIN');
-    //   });
-    // }
     return new Promise(async (resolve, reject) => {
       try {
         const user: any = await this.authenticate(req, res);
@@ -101,15 +91,12 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
 
   async logout(req) {
     console.warn('logout service');
-    req.logout();
     if (AuthConfig.options.pubSubService) {
       AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDOUT', {
-        success: true
+        userId: req.user.id
       });
-      // AuthConfig.options.pubSubService.subscribeEvent('USER_LOGGEDOUT', (data) => {
-      //   console.log('subscribed to USER_LOGGEDOUT');
-      // });
     }
+    req.logout();
     console.warn('req.logout');
     return req.session && req.session.save();
   }

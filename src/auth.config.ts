@@ -67,14 +67,15 @@ export class AuthConfig {
     // passport config
     this.authService = new AuthService(AuthConfig.options.userModel, AuthConfig.options.secretKey);
     const authRoutes = new AuthRoutes(this.authService);
-    app.use('/auth', authRoutes.router);
     const user = AuthConfig.options.userModel as PassportLocalModel<IUser>;
-    const pubRoutes = (AuthConfig.options.publicRoutes || []).concat('auth\\/login', 'auth\\/register', 'auth\\/activation').join('|');
-    const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
-    app.use(publicRegExp, this.authService.checkForAuth);
     const enrichRoutes = (AuthConfig.options.enrichedRoutes || []).concat('auth\\/logout').join('|');
     const enrichRegExp = new RegExp(`^(.*(${enrichRoutes})).*$`);
     app.use(enrichRegExp, this.authService.enrichAuth);
+    const pubRoutes = (AuthConfig.options.publicRoutes || [])
+      .concat('auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation').join('|');
+    const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
+    app.use(publicRegExp, this.authService.checkForAuth);
+    app.use('/auth', authRoutes.router);
     passport.use(new LocalStrategy(user.authenticate()));
     passport.serializeUser(user.serializeUser());
     passport.deserializeUser(user.deserializeUser());
