@@ -76,7 +76,8 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         const token = sign(await this.serialize(user), this.secret, { expiresIn: 24 * 120 * 60 });
         if (AuthConfig.options.pubSubService) {
           AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
-            userId: suser.id
+            userId: suser.id,
+            player_id: req.body.player_id
           });
         }
         resolve({
@@ -93,7 +94,8 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     console.warn('logout service');
     if (AuthConfig.options.pubSubService) {
       AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDOUT', {
-        userId: req.user.id
+        userId: req.user.id,
+        player_id: req.query.player_id
       });
     }
     req.logout();
