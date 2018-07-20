@@ -234,25 +234,25 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
 
   private async serialize(user) {
     // we store the updated information in req.user again
-    const { id, username, email, firstname, lastname, status } = user;
+    const { id, username, email, firstname, lastname, emailStatus, deleted } = user;
     const userFields = {};
     if (AuthConfig.options.userFields) {
-      AuthConfig.options.userFields.reduce((fields, field) => {
-        fields[field] = user[field];
-      }, userFields);
+      AuthConfig.options.userFields.forEach((field) => {
+        userFields[field] = user[field];
+      });
     }
-    let suser = {
+    const suser = {
       id,
       username,
       email,
       firstname,
       lastname,
-      status,
+      emailStatus,
+      deleted,
       ...userFields
     };
-
     if (AuthConfig.options.serializationHelper) {
-      suser = await AuthConfig.options.serializationHelper(suser);
+      suser['roles'] = await AuthConfig.options.serializationHelper(suser);
     }
     return suser;
   }
