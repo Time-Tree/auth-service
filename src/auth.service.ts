@@ -241,7 +241,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         userFields[field] = user[field];
       });
     }
-    const suser = {
+    let suser = {
       id,
       username,
       email,
@@ -252,7 +252,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       ...userFields
     };
     if (AuthConfig.options.serializationHelper) {
-      suser['roles'] = await AuthConfig.options.serializationHelper(suser);
+      suser = await AuthConfig.options.serializationHelper(suser);
     }
     return suser;
   }
