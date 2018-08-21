@@ -9,7 +9,7 @@ export const register = (user: IUser) => {
       <mj-column width="auto">
         <mj-text align="left" font-weight="400">Va rugam sa va activati contul din aplicatia Columna accesand urmatorul link:  ${
           options.host
-        }/auth/activation/${user.registrationToken}.</mj-text>
+        }/auth/activation/${user.registrationToken}</mj-text>
       </mj-column>
     `);
 };

@@ -126,8 +126,6 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         if (err) {
           return reject(err);
         }
-        console.log(user.status);
-        console.log(user.phoneStatus);
         if (user.emailStatus === UserStatusEnum.PENDING_ACTIVATION && user.phoneStatus === UserPhoneStatusEnum.NOT_CONFIRMED) {
           return reject({
             code: 'NOT_ACTIVATED',
@@ -223,7 +221,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
           user.emailStatus = UserStatusEnum.REGISTERED;
           user.registrationToken = undefined;
           await user.save();
-          resolve(user);
+          resolve('Succes');
         } else {
           reject({
             code: 'NO ACTIVATION FOUND',
