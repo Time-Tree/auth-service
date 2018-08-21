@@ -34,6 +34,8 @@ export interface AuthConfigOptions {
   userFields?;
   serializationHelper?: (user) => any;
   pubSubService?: IPubSubService;
+  mailSenderName?: string;
+  mailSenderEmail?: string;
 }
 
 const DefaultConfigOptions: AuthConfigOptions = {

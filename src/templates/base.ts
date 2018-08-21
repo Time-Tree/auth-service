@@ -22,8 +22,7 @@ export const footer = (email, host) =>
   `<mj-section padding="10px 20px" vertical-align="middle" background-color="#DDDDDD">
       <mj-column width="100%">
         <mj-text align="left" font-weight="500">NEED OUR HELP?</mj-text>
-        <mj-text align="left" font-weight="500">If you have any questions please contact us at ${email}
-         or write us on Facebook at ${host}/contact.</mj-text>
+        <mj-text align="left" font-weight="500">If you have any questions please contact us at ${email}.</mj-text>
         <mj-text align="left" font-weight="400">Thank you!</mj-text>
       </mj-column>
     </mj-section>

@@ -49,7 +49,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
             AuthConfig.options.mailerService &&
               AuthConfig.options.mailerService.sendMail(
                 user.email,
-                `Authorize your account at ${AuthConfig.options.appTitle} `,
+                `Verificare email pentru aplicatia ${AuthConfig.options.appTitle} `,
                 register(u)
               );
           }
@@ -126,7 +126,9 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         if (err) {
           return reject(err);
         }
-        if (user.status === UserStatusEnum.PENDING_ACTIVATION && user.phoneStatus === UserPhoneStatusEnum.NOT_CONFIRMED) {
+        console.log(user.status);
+        console.log(user.phoneStatus);
+        if (user.emailStatus === UserStatusEnum.PENDING_ACTIVATION && user.phoneStatus === UserPhoneStatusEnum.NOT_CONFIRMED) {
           return reject({
             code: 'NOT_ACTIVATED',
             message: 'Please activate accout using the link sent to your email'
@@ -237,7 +239,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     const { id, username, email, firstname, lastname, emailStatus, deleted } = user;
     const userFields = {};
     if (AuthConfig.options.userFields) {
-      AuthConfig.options.userFields.forEach((field) => {
+      AuthConfig.options.userFields.forEach(field => {
         userFields[field] = user[field];
       });
     }

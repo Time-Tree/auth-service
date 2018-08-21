@@ -1,5 +1,6 @@
 import * as sendgrid from '@sendgrid/mail';
 import logger from '../utils/logger';
+import AuthConfig from '..';
 
 const sg: any = sendgrid;
 export default class Mailer {
@@ -15,8 +16,8 @@ export default class Mailer {
     const msg = {
       to,
       from: {
-        name: 'Regage',
-        email: 'regage@timetree.io'
+        name: `${AuthConfig.options.mailSenderName || 'Regage'}`,
+        email: `${AuthConfig.options.mailSenderEmail || 'regage@timetree.io'}`
       },
       subject,
       text,

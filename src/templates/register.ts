@@ -7,10 +7,9 @@ export const register = (user: IUser) => {
   const options = AuthConfig.options;
   return baseMail(`
       <mj-column width="auto">
-        <mj-text align="left" font-weight="400">Dear ${user.firstname} ${user.lastname}</mj-text>
-        <mj-text align="left" font-weight="400">Please activate your account ${options.host}/auth/activation/${
-    user.registrationToken
-    }.</mj-text>
+        <mj-text align="left" font-weight="400">Va rugam sa va activati contul din aplicatia Columna accesand urmatorul link:  ${
+          options.host
+        }/auth/activation/${user.registrationToken}.</mj-text>
       </mj-column>
     `);
 };
