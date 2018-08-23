@@ -8,7 +8,7 @@ import { promisify } from 'util';
 import * as passportLocalMongoose from 'passport-local-mongoose';
 
 import logger from './utils/logger';
-import { ErrorCodes } from './constants/types';
+import { ErrorCodes, AuthActions } from './constants/types';
 import { IUser, UserStatusEnum, UserPhoneStatusEnum } from './users/users.model';
 import UserService from './users/users.service';
 import AuthConfig from '.';
@@ -30,7 +30,8 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     const password = user.password as string;
     delete user.password;
     user.emailStatus = UserStatusEnum.PENDING_ACTIVATION;
-    const newUser = new this.model(user);
+    const suser = await this.serialize(user, AuthActions.REGISTER);
+    const newUser = new this.model(suser);
     return new Promise((resolve, reject) => {
       this.model.register(newUser, password, async (err, u: IUser) => {
         if (err) {
@@ -72,8 +73,8 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     return new Promise(async (resolve, reject) => {
       try {
         const user: any = await this.authenticate(req, res);
-        const suser = await this.serialize(user);
-        const token = sign(await this.serialize(user), this.secret, { expiresIn: 24 * 120 * 60 });
+        const suser = await this.serialize(user, AuthActions.LOGIN);
+        const token = sign(await this.serialize(user, AuthActions.LOGIN), this.secret, { expiresIn: 24 * 120 * 60 });
         if (AuthConfig.options.pubSubService) {
           AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
             userId: suser.id,
@@ -232,7 +233,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     });
   }
 
-  private async serialize(user) {
+  private async serialize(user, action?) {
     // we store the updated information in req.user again
     const { id, username, email, firstname, lastname, emailStatus, deleted } = user;
     const userFields = {};
@@ -252,7 +253,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       ...userFields
     };
     if (AuthConfig.options.serializationHelper) {
-      suser = await AuthConfig.options.serializationHelper(suser);
+      suser = await AuthConfig.options.serializationHelper(suser, action);
     }
     return suser;
   }

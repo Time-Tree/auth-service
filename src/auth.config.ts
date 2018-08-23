@@ -32,7 +32,7 @@ export interface AuthConfigOptions {
   publicRoutes?: string[];
   enrichedRoutes?: string[];
   userFields?;
-  serializationHelper?: (user) => any;
+  serializationHelper?: (user, action?) => any;
   pubSubService?: IPubSubService;
   mailSenderName?: string;
   mailSenderEmail?: string;
@@ -74,7 +74,8 @@ export class AuthConfig {
     const enrichRegExp = new RegExp(`^(.*(${enrichRoutes})).*$`);
     app.use(enrichRegExp, this.authService.enrichAuth);
     const pubRoutes = (AuthConfig.options.publicRoutes || [])
-      .concat('auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation').join('|');
+      .concat('auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation')
+      .join('|');
     const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
     app.use(publicRegExp, this.authService.checkForAuth);
     app.use('/auth', authRoutes.router);
