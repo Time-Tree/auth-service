@@ -169,7 +169,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       user.resetPasswordExpires = Date.now() + 3600000;
       const saveduser = await user.save();
       AuthConfig.options.mailerService && AuthConfig.options.mailerService.sendMail(user.email, `Account Password Reset`, reset(saveduser));
-      return saveduser;
+      return { email };
     }
     return Promise.reject('User not found');
   }
