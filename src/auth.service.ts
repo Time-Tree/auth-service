@@ -74,7 +74,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       try {
         const user: any = await this.authenticate(req, res);
         const suser = await this.serialize(user, AuthActions.LOGIN);
-        const token = sign(await this.serialize(user, AuthActions.LOGIN), this.secret, { expiresIn: 24 * 120 * 60 });
+        const token = sign(suser, this.secret, { expiresIn: 24 * 120 * 60 });
         if (AuthConfig.options.pubSubService) {
           AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
             userId: suser.id,
