@@ -73,6 +73,12 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     return new Promise(async (resolve, reject) => {
       try {
         const user: any = await this.authenticate(req, res);
+        if (user.status === 'DEACTIVATED') {
+          reject({
+            code: 'NOT_ACTIVATED',
+            message: 'User is  deactivated.'
+          });
+        }
         const suser = await this.serialize(user, AuthActions.LOGIN);
         const token = sign(suser, this.secret, { expiresIn: 24 * 120 * 60 });
         if (AuthConfig.options.pubSubService) {
