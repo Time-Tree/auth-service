@@ -8,7 +8,7 @@ export const register = (user: IUser) => {
   return baseMail(`
       <mj-column width="auto">
         <mj-text align="left" font-weight="400">Dear ${user.firstname} ${user.lastname}</mj-text>
-        <mj-text align="left" font-weight="400">Please activate your account at http://${options.host}/auth/activation/${user.registrationToken} </mj-text>
+        <mj-text align="left" font-weight="400">Please activate your account at <a href="${options.host}/auth/activation/${user.registrationToken}">this link </a> </mj-text>
       </mj-column>
     `);
 };
