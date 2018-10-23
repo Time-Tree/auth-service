@@ -50,7 +50,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
             AuthConfig.options.mailerService &&
               AuthConfig.options.mailerService.sendMail(
                 user.email,
-                `Verificare email pentru aplicatia ${AuthConfig.options.appTitle} `,
+                `Account activation for ${AuthConfig.options.appTitle} `,
                 register(u)
               );
           }
