@@ -29,7 +29,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     logger.msg('Registering user with email: ' + user.email);
     const password = user.password as string;
     delete user.password;
-    user.emailStatus = UserStatusEnum.PENDING_ACTIVATION;
+    // user.emailStatus = UserStatusEnum.PENDING_ACTIVATION;
     const suser = await this.serialize(user, AuthActions.REGISTER);
     const newUser = new this.model(suser);
     return new Promise((resolve, reject) => {
