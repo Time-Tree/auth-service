@@ -98,7 +98,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   }
 
   async logout(req) {
-    console.warn('logout service');
+    logger.msg('logout service');
     if (AuthConfig.options.pubSubService) {
       AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDOUT', {
         userId: req.user.id,
@@ -106,7 +106,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       });
     }
     req.logout();
-    console.warn('req.logout');
+    logger.msg('req.logout');
     return req.session && req.session.save();
   }
 
@@ -129,7 +129,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   authenticate(req, res) {
     return new Promise((resolve, reject) => {
       passport.authenticate('local', { session: true }, (err, user, info) => {
-        logger.msg('Trying to login user with email: ');
+        logger.msg('Trying to login user with email: ' + user.email);
         if (err) {
           return reject(err);
         }
@@ -153,7 +153,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
 
   // middlewares
   checkForAuth = (req, res, next) => {
-    console.warn('checking for auth');
+    logger.msg('checking for auth');
     if (req.user) {
       return next();
     }
@@ -161,7 +161,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
   };
 
   enrichAuth = (req, res, next) => {
-    console.warn('enriched route');
+    logger.msg('enriched route');
     this.checkForAuth(req, res, err => {
       next();
     });
