@@ -78,12 +78,8 @@ export class AuthConfig {
     const enrichRoutes = (AuthConfig.options.enrichedRoutes || []).concat('auth\\/logout').join('|');
     const enrichRegExp = new RegExp(`^(.*(${enrichRoutes})).*$`);
     app.use(enrichRegExp, this.authService.enrichAuth);
-    const publicRoutes = ['auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation'];
-    if (AuthConfig.options.facebookLogin) {
-      publicRoutes.concat('auth\\/facebook');
-    }
     const pubRoutes = (AuthConfig.options.publicRoutes || [])
-      .concat(publicRoutes)
+      .concat('auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation', 'auth\\/facebook')
       .join('|');
     const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
     app.use(publicRegExp, this.authService.checkForAuth);

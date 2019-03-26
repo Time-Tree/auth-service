@@ -1,7 +1,5 @@
 import * as express from 'express';
 import { Router } from 'express';
-import * as passport from 'passport';
-import * as uuid from 'uuid';
 
 import { BaseRoutes } from '@timetree/base-service';
 
