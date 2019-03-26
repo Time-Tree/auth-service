@@ -1,5 +1,6 @@
 import * as passport from 'passport';
 import * as passportLocal from 'passport-local';
+import * as FacebookTokenStrategy from 'passport-facebook-token';
 import UserModel, { IUser } from './users/users.model';
 import { PassportLocalModel, Document, Model } from 'mongoose';
 import * as passportLocalMongoose from 'passport-local-mongoose';
@@ -17,6 +18,9 @@ export interface AuthConfigOptions {
   secretKey: string;
   emailConfirmation?: boolean;
   smsConfirmation?: boolean;
+  facebookLogin?: boolean;
+  fbClientId?: string;
+  fbClientSecret?: string;
   mailerService?: {
     sendMail: (to, subject, body) => Promise<any>;
   };
@@ -42,6 +46,7 @@ const DefaultConfigOptions: AuthConfigOptions = {
   secretKey: process.env.SECRET_KEY || '',
   emailConfirmation: true,
   smsConfirmation: false,
+  facebookLogin: false,
   userModel: UserModel,
   host: process.env.HOST,
   appTitle: process.env.APP_NAME,
@@ -73,8 +78,12 @@ export class AuthConfig {
     const enrichRoutes = (AuthConfig.options.enrichedRoutes || []).concat('auth\\/logout').join('|');
     const enrichRegExp = new RegExp(`^(.*(${enrichRoutes})).*$`);
     app.use(enrichRegExp, this.authService.enrichAuth);
+    const publicRoutes = ['auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation'];
+    if (AuthConfig.options.facebookLogin) {
+      publicRoutes.concat('auth\\/facebook');
+    }
     const pubRoutes = (AuthConfig.options.publicRoutes || [])
-      .concat('auth\\/logout', 'auth\\/login', 'auth\\/register', 'auth\\/activation')
+      .concat(publicRoutes)
       .join('|');
     const publicRegExp = new RegExp(`^(?!.*(${pubRoutes})).*$`);
     app.use(publicRegExp, this.authService.checkForAuth);
@@ -82,6 +91,18 @@ export class AuthConfig {
     passport.use(new LocalStrategy(user.authenticate()));
     passport.serializeUser(user.serializeUser());
     passport.deserializeUser(user.deserializeUser());
+
+    if (AuthConfig.options.facebookLogin) {
+      passport.use(new FacebookTokenStrategy({
+        clientID: AuthConfig.options.fbClientId,
+        clientSecret: AuthConfig.options.fbClientSecret
+      }, (accessToken, refreshToken, profile, done) => {
+        // @ts-ignore
+        user.upsertFbUser(accessToken, refreshToken, profile, (err, fbUser) => {
+          return done(err, fbUser);
+        });
+      }));
+    }
   }
   public getService = () => this.authService;
 }

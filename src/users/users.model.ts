@@ -1,6 +1,7 @@
 import * as mongoose from 'mongoose';
 import { PassportLocalModel, Document } from 'mongoose';
 import * as passportLocalMongoose from 'passport-local-mongoose';
+import AuthConfig from '..';
 
 const Schema = mongoose.Schema;
 
@@ -30,6 +31,7 @@ export interface IUser extends Document {
   deleted?: boolean;
   resetPasswordToken?: string;
   resetPasswordExpires?: number;
+  facebookId?: string;
 }
 
 const UserRepo = new Schema({
@@ -44,6 +46,10 @@ const UserRepo = new Schema({
     type: String,
     unique: true,
     required: true
+  },
+  facebookId: {
+    type: String,
+    select: false
   },
   phone: {
     type: String,
@@ -90,6 +96,36 @@ const UserRepo = new Schema({
     required: false
   }
 });
+
+UserRepo.statics.upsertFbUser = function(accessToken, refreshToken, profile, cb) {
+  const model = AuthConfig.options.userModel || this;
+  return model.findOne({ facebookId: profile.id }, (err, user) => {
+    if (!user) {
+      const newUser = new model({
+        email: profile._json.email,
+        firstname: profile._json.first_name,
+        lastname: profile._json.last_name,
+        facebookId: profile.id,
+        emailStatus: UserStatusEnum.REGISTERED
+      });
+
+      newUser.save((error, savedUser) => {
+        if (error) {
+          return cb(error, null);
+        }
+        if (AuthConfig.options.pubSubService) {
+          AuthConfig.options.pubSubService.publishEvent('USER_REGISTERED', {
+            user: savedUser,
+            appTitle: AuthConfig.options.appTitle
+          });
+        }
+        return cb(error, savedUser);
+      });
+    } else {
+      return cb(err, user);
+    }
+  });
+};
 
 UserRepo.plugin(passportLocalMongoose, {
   usernameField: 'email',

@@ -151,6 +151,45 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     });
   }
 
+  facebookAuth(req, res) {
+    return new Promise((resolve, reject) => {
+      passport.authenticate('facebook-token', { session: false }, (err, user) => {
+        if (err) {
+          return reject({ code: '401', message: 'User not authenticated' });
+        }
+        return resolve(user);
+      })(req, res);
+    });
+  }
+
+  facebookLogin(req, res) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const user: any = await this.facebookAuth(req, res);
+        if (!user) {
+          reject({
+            code: '401',
+            message: 'Error logging in with facebook'
+          });
+        }
+        const suser = await this.serialize(user, AuthActions.LOGIN);
+        const token = sign(suser, this.secret, { expiresIn: 24 * 120 * 60 });
+        if (AuthConfig.options.pubSubService) {
+          AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
+            userId: suser.id,
+            player_id: req.body.player_id
+          });
+        }
+        resolve({
+          user: suser,
+          token
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   // middlewares
   checkForAuth = (req, res, next) => {
     logger.msg('checking for auth');

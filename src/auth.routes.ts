@@ -21,6 +21,7 @@ export class AuthRoutes extends BaseRoutes<AuthService> {
   private sendPhoneConfirmation;
   private confirmPhone;
   private activate;
+  private facebook;
   constructor(authService: AuthService) {
     const router = express.Router();
 
@@ -38,6 +39,7 @@ export class AuthRoutes extends BaseRoutes<AuthService> {
     this.sendPhoneConfirmation = this.routeHandler(service.sendPhoneConfirmationCode, req => [req.params.userId]);
     this.confirmPhone = this.routeHandler(service.confirmPhone, req => [req.body.phoneCode, req.params.userId]);
     this.activate = this.routeHandler(service.activate, req => [req.params.token]);
+    this.facebook = this.routeHandler(service.facebookLogin, req => [req]);
   }
   initRoutes(router: Router) {
     router.post('/register', this.register);
@@ -56,5 +58,9 @@ export class AuthRoutes extends BaseRoutes<AuthService> {
     router.get('/activation/:token', this.activate);
     // ok
     router.post('/confirmPhone/:userId', this.confirmPhone);
+
+    if (AuthConfig.options.facebookLogin) {
+      router.post('/facebook', this.facebook);
+    }
   }
 }
