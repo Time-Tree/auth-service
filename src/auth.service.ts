@@ -155,7 +155,10 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
     return new Promise((resolve, reject) => {
       passport.authenticate('facebook-token', { session: false }, (err, user) => {
         if (err) {
-          return reject({ code: '401', message: 'User not authenticated' });
+          if (err.name === 'InternalOAuthError') {
+            return reject({ code: err.oauthError.statusCode, message: err.oauthError.data });
+          }
+          return reject({ code: '401', message: 'Error authenticating user' });
         }
         return resolve(user);
       })(req, res);
