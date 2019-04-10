@@ -23,6 +23,11 @@ export default class Mailer {
       text,
       html
     };
-    return await sg.send(msg);
+    try {
+      return await sg.send(msg);
+    } catch (e) {
+      logger.err(`Error sending email. Sendgrid error ${JSON.stringify(e)}`);
+      return null;
+    }
   };
 }

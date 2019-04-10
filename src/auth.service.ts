@@ -133,7 +133,9 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
         if (err) {
           return reject(err);
         }
-        if (user.emailStatus === UserStatusEnum.PENDING_ACTIVATION && user.phoneStatus === UserPhoneStatusEnum.NOT_CONFIRMED) {
+        if (AuthConfig.options.checkUserStatus &&
+          user.emailStatus === UserStatusEnum.PENDING_ACTIVATION &&
+          user.phoneStatus === UserPhoneStatusEnum.NOT_CONFIRMED) {
           return reject({
             code: 'NOT_ACTIVATED',
             message: 'Please activate accout using the link sent to your email'
@@ -153,7 +155,10 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
 
   facebookAuth(req, res) {
     return new Promise((resolve, reject) => {
-      passport.authenticate('facebook-token', { session: false }, (err, user) => {
+      passport.authenticate('facebook-token', {
+        scope: ['email', 'public_profile'],
+        session: false
+      }, (err, user) => {
         if (err) {
           if (err.name === 'InternalOAuthError') {
             return reject({ code: err.oauthError.statusCode, message: err.oauthError.data });

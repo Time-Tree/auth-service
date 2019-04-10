@@ -19,6 +19,7 @@ export interface AuthConfigOptions {
   emailConfirmation?: boolean;
   smsConfirmation?: boolean;
   facebookLogin?: boolean;
+  checkUserStatus?: boolean;
   fbClientId?: string;
   fbClientSecret?: string;
   mailerService?: {
@@ -47,6 +48,7 @@ const DefaultConfigOptions: AuthConfigOptions = {
   emailConfirmation: true,
   smsConfirmation: false,
   facebookLogin: false,
+  checkUserStatus: true,
   userModel: UserModel,
   host: process.env.HOST,
   appTitle: process.env.APP_NAME,
@@ -91,7 +93,16 @@ export class AuthConfig {
     if (AuthConfig.options.facebookLogin) {
       passport.use(new FacebookTokenStrategy({
         clientID: AuthConfig.options.fbClientId,
-        clientSecret: AuthConfig.options.fbClientSecret
+        clientSecret: AuthConfig.options.fbClientSecret,
+        profileFields: ['email',
+          'first_name',
+          'last_name',
+          'age_range',
+          'birthday',
+          'hometown',
+          'location',
+          'link',
+          'gender']
       }, (accessToken, refreshToken, profile, done) => {
         // @ts-ignore
         user.upsertFbUser(accessToken, refreshToken, profile, (err, fbUser) => {
