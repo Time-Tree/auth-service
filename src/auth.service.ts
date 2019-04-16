@@ -99,7 +99,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
 
   async logout(req) {
     logger.msg('logout service');
-    if (AuthConfig.options.pubSubService) {
+    if (AuthConfig.options.pubSubService && req.user) {
       AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDOUT', {
         userId: req.user.id,
         player_id: req.query.player_id
