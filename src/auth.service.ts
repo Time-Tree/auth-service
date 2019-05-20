@@ -80,11 +80,12 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
           });
         }
         const suser = await this.serialize(user, AuthActions.LOGIN);
-        const token = sign(suser, this.secret, { expiresIn: 24 * 120 * 60 });
+        const token = this.getToken(suser, AuthConfig.options.tokenExpiration);
         if (AuthConfig.options.pubSubService) {
           AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
             userId: suser.id,
             player_id: req.body.player_id
+            // sessionId: req.session && req.session.id ? req.session.id : null
           });
         }
         resolve({
@@ -181,7 +182,7 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
           });
         }
         const suser = await this.serialize(user, AuthActions.LOGIN);
-        const token = sign(suser, this.secret, { expiresIn: 24 * 120 * 60 });
+        const token = this.getToken(suser, AuthConfig.options.tokenExpiration);
         if (AuthConfig.options.pubSubService) {
           AuthConfig.options.pubSubService.publishEvent('USER_LOGGEDIN', {
             userId: suser.id,
@@ -309,6 +310,14 @@ export class AuthService extends BaseService<IUser, Model<IUser>> {
       suser = await AuthConfig.options.serializationHelper(suser, action);
     }
     return suser;
+  }
+
+  private getToken(user, expiration) {
+    if (expiration) {
+      return sign(user, this.secret, { expiresIn: expiration });
+    } else {
+      return sign(user, this.secret);
+    }
   }
 
   private verifyStatus(user) {

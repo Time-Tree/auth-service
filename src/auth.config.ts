@@ -30,13 +30,14 @@ export interface AuthConfigOptions {
   appTitle?: string;
   contactEmail?: string;
   mailerApiKey?: string;
+  tokenExpiration?: number | null;
   smsConfig?: {
     apiKey?: string;
     apiSecret?: string;
   };
   publicRoutes?: string[];
   enrichedRoutes?: string[];
-  userFields?;
+  userFields?: string[];
   serializationHelper?: (user, action?) => any;
   pubSubService?: IPubSubService;
   mailSenderName?: string;
@@ -49,6 +50,7 @@ const DefaultConfigOptions: AuthConfigOptions = {
   smsConfirmation: false,
   facebookLogin: false,
   checkUserStatus: true,
+  tokenExpiration: null,
   userModel: UserModel,
   host: process.env.HOST,
   appTitle: process.env.APP_NAME,
