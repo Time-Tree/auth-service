@@ -27,10 +27,12 @@ export interface AuthConfigOptions {
   };
   userModel?: Model<Document>;
   host?: string;
+  hostFE?: string;
   appTitle?: string;
   contactEmail?: string;
   mailerApiKey?: string;
   tokenExpiration?: number | null;
+  emailSocialMedia?: any;
   smsConfig?: {
     apiKey?: string;
     apiSecret?: string;
@@ -51,8 +53,13 @@ const DefaultConfigOptions: AuthConfigOptions = {
   facebookLogin: false,
   checkUserStatus: true,
   tokenExpiration: null,
+  emailSocialMedia: {
+    facebook: '',
+    linkedin: ''
+  },
   userModel: UserModel,
   host: process.env.HOST,
+  hostFE: process.env.HOSTFE,
   appTitle: process.env.APP_NAME,
   contactEmail: process.env.CONTACT_EMAIL,
   mailerApiKey: process.env.SENDGRID_API_KEY,

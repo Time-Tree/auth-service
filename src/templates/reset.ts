@@ -6,9 +6,20 @@ import { IUser } from '../users/users.model';
 export const reset = (user: IUser) => {
   const options = AuthConfig.options;
   return baseMail(`
-      <mj-column width="auto">
-        <mj-text align="left" font-weight="400">Dear ${user.firstname} ${user.lastname}</mj-text>
-        <mj-text align="left" font-weight="400">Reset your password at <a href="http://${options.host}/auth/reset-password/${user.resetPasswordToken}">this link </a> </mj-text>
+  <mj-section padding="30px 0">
+      <mj-column width="45%">
+        <mj-text align="center" font-weight="500" padding="0px" font-size="18px">Account Password Reset</mj-text>
+          <mj-image align="center" width="70px" href="${options.host}" src=${process.env.REGAGE_LOGO}></mj-image>
       </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column width="100%">
+        <mj-text>
+          <p>Dear ${user.firstname} ${user.lastname},</p>
+          <p>Reset your password at ${options.hostFE}/auth/reset-password/${user.resetPasswordToken}.</p>
+          <p> If you did not requested the password reset please contact us! </p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
     `);
 };

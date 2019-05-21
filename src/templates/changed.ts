@@ -6,9 +6,19 @@ import { IUser } from '../users/users.model';
 export const changed = (user: IUser) => {
   const options = AuthConfig.options;
   return baseMail(`
-      <mj-column width="auto">
-        <mj-text align="left" font-weight="400">Dear ${user.firstname} ${user.lastname}</mj-text>
-        <mj-text align="left" font-weight="400">Your password has been changed.</mj-text>
+    <mj-section padding="30px 0">
+      <mj-column width="45%">
+        <mj-text align="center" font-weight="500" padding="0px" font-size="18px">Account Password Reset</mj-text>
+          <mj-image align="center" width="70px" href="${options.host}" src=${process.env.REGAGE_LOGO}></mj-image>
       </mj-column>
+    </mj-section>
+      <mj-section>
+        <mj-column width="100%">
+          <mj-text>
+            <p>Dear ${user.firstname} ${user.lastname},</p>
+            <p>Your password has been changed successfully! </p>
+          </mj-text>
+        </mj-column>
+      </mj-section>
     `);
 };
