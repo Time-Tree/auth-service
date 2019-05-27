@@ -8,8 +8,8 @@ export const reset = (user: IUser) => {
   return baseMail(`
   <mj-section padding="30px 0">
       <mj-column width="45%">
+        <mj-image align="center" width="70px" href="${options.host}" src=${process.env.REGAGE_LOGO}></mj-image>
         <mj-text align="center" font-weight="500" padding="0px" font-size="18px">Account Password Reset</mj-text>
-          <mj-image align="center" width="70px" href="${options.host}" src=${process.env.REGAGE_LOGO}></mj-image>
       </mj-column>
     </mj-section>
     <mj-section>
