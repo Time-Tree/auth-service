@@ -10,7 +10,7 @@
     "express": "^4.16.3",
     "express-jwt": "^5.3.0",
     "express-session": "^1.15.6",
-    "jsonwebtoken": "^8.3.0",
+    "jsonwebtoken": "^9.0.0",
     "mjml": "^4.0.5",
     "moment": "^2.24.0",
     "mongoose": "^5.1.6",
